@@ -11,8 +11,8 @@ app.get('/', async(req, res) => {
            const postback = new Postback({ click, idfa, aaid, user_agent, os, os_version, app_version, country, event });
 
     try {
-        await postback.save();
-        res.status(200).send('Postback received and saved successfully');
+        const data = await postback.save();
+        res.status(200).json({data});
         } catch (error) {
         console.error('Error saving postback:', error);
         res.status(500).send('Error saving postback');
