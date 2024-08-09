@@ -1,13 +1,22 @@
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect('mongodb://localhost:27017/user');
-    console.log('Connected to MongoDB');
-  } catch (err) {
-    console.error('Connection error:', err);
-    process.exit(1);
-  }
-};
+mongoose.connect('mongodb://localhost:27017/user', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+console.log("db")
+const postbackSchema = new mongoose.Schema({
+    click: String,
+    idfa: String,
+    aaid: String,
+    user_agent: String,
+    os: String,
+    os_version: String,
+    app_version: String,
+    country: String,
+    event: String,
+    timestamp: { type: Date, default: Date.now }
+});
+const Postback = mongoose.model('Postback', postbackSchema);
 
-module.exports = connectDB;
+module.exports =Postback ;

@@ -1,18 +1,25 @@
 const express = require('express');
-const connectDB = require('./db');
-const visitController = require('./controllers/traffic-controller');
-
 const app = express();
-const port = 3000;
+const Postback = require('./db.js')
 
-app.use(express.json());
-connectDB();
+app.get('/', async(req, res) => {
+    const {click,idfa,aaid,user_agent,os,os_version,app_version,country,event}=  req.query;
+    console.log(`Received event: ${event}\n`,`Click ID: ${click}\n`,`IDFA: ${idfa}\n`,`AAID: ${aaid}\n`,
+          `Received event: ${user_agent}\n`,`Click ID: ${os}\n`,`IDFA: ${os_version}\n`,`AAID: ${app_version}\n`,
+          `county:${country}\n`
+           );
+           const postback = new Postback({ click, idfa, aaid, user_agent, os, os_version, app_version, country, event });
 
-app.post('/visits',visitController.loginMiddleware, visitController.fetchAndProcessTrafficVisits);
-app.post('/product-urls',visitController.generateUtmLinks);
-app.post('/feed-of-orders',visitController.loginMiddleware,visitController.feedOfOrders);
-app.post('/kcpc-product-urls',visitController.generateUtmLinksKcpc);
+    try {
+        await postback.save();
+        res.status(200).send('Postback received and saved successfully');
+        } catch (error) {
+        console.error('Error saving postback:', error);
+        res.status(500).send('Error saving postback');
+        }
+});
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
